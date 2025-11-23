@@ -80,10 +80,12 @@ const paint = (x, y) => {
 .grid-container {
   display: flex;
   flex-direction: column;
-  gap: 1px; /* Gap between rows */
-  background-color: var(--bg-tertiary);
-  padding: 1px;
-  border-radius: 2px;
+  gap: 0;
+  background-color: transparent;
+  padding: 0;
+  border-top: 1px solid #475569;
+  border-left: 1px solid #475569;
+  border-radius: 0;
   width: fit-content;
   margin: 0 auto;
   user-select: none;
@@ -92,7 +94,7 @@ const paint = (x, y) => {
 
 .grid-row {
   display: flex;
-  gap: 1px; /* Gap between cols */
+  gap: 0;
 }
 
 .grid-cell {
@@ -101,6 +103,9 @@ const paint = (x, y) => {
   background-color: var(--bg-secondary); /* Default empty color */
   cursor: crosshair;
   transition: background-color 0.05s;
+  border-right: 1px solid #475569;
+  border-bottom: 1px solid #475569;
+  box-sizing: border-box; /* Ensure border is included in width/height */
 }
 
 .grid-cell:hover {
