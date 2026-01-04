@@ -23,29 +23,38 @@ const props = defineProps({
 const emit = defineEmits(['paint', 'stroke-start'])
 
 const isDrawing = ref(false)
+const currentDrawingColor = ref(null)
 
-const startDrawing = (x, y) => {
+const startDrawing = (x, y, event) => {
+  // 0 = Left click (Paint), 2 = Right click (Erase)
+  if (event.button !== 0 && event.button !== 2) return
+  
   emit('stroke-start')
   isDrawing.value = true
-  paint(x, y)
+  
+  // Set the color for this stroke
+  currentDrawingColor.value = event.button === 2 ? '' : props.selectedColor
+  
+  paint(x, y, currentDrawingColor.value)
   window.addEventListener('mouseup', stopDrawing)
 }
 
 const stopDrawing = () => {
   isDrawing.value = false
+  currentDrawingColor.value = null
   window.removeEventListener('mouseup', stopDrawing)
 }
 
 const handleMouseEnter = (x, y) => {
   if (isDrawing.value) {
-    paint(x, y)
+    paint(x, y, currentDrawingColor.value)
   }
 }
 
-const paint = (x, y) => {
+const paint = (x, y, color) => {
   // Avoid unnecessary emits if color is same
-  if (props.gridData[y][x] !== props.selectedColor) {
-    emit('paint', { x, y, color: props.selectedColor })
+  if (props.gridData[y][x] !== color) {
+    emit('paint', { x, y, color })
   }
 }
 </script>
@@ -58,6 +67,7 @@ const paint = (x, y) => {
       '--grid-height': height
     }"
     @mouseleave="stopDrawing"
+    @contextmenu.prevent
   >
     <div 
       v-for="(row, y) in gridData" 
@@ -69,7 +79,7 @@ const paint = (x, y) => {
         :key="`${x}-${y}`"
         class="grid-cell"
         :style="{ backgroundColor: color || 'transparent' }"
-        @mousedown.prevent="startDrawing(x, y)"
+        @mousedown.prevent="startDrawing(x, y, $event)"
         @mouseenter="handleMouseEnter(x, y)"
       ></div>
     </div>
